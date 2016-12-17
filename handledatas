@@ -1,0 +1,48 @@
+var handle = {
+	//通过id找到对应的数据
+	getSelfById(data,id){
+		return data.find(function(value){//从data中找到满足条件的第一个数据
+			return value.id == id;
+		})
+	},
+	//通过id找到子数据，因为子数据有很多，所有用filter
+	getChildsById(data,id){
+		return data.filter(function(value){//filter(筛选符合条件的value，返回一个新数组)
+			return value.pid == id;
+		})
+	},
+	//通过id找到其父数据，包含自己
+	getParentsAllById(data,id){
+		var arr = [];
+		var self = handle.getSelfById(data,id);//找到自己
+		if(self){
+			arr.push(self);//把自己放在数组中
+			arr = arr.concat(handle.getParentsAllById(data,self.pid));
+					//pid是父级的id，相当于传入父级的id，找到父数据，添加到数组中。
+		}
+		return arr;
+	},
+	
+	//在指定id的所有的子数据中，是否存在某个title；（找父级下的平级子级）存在ture 不存在false
+	isTitleExist(data,value,id){//id是父级
+		var childs = handle.getChildsById(data,id);//通过id得到子数据，
+		return childs.findIndex(function(item){//遍历子数据，每一项中的title与我们新建的value相比
+			return item.title === value;
+		})!==-1;//findIndex返回符合条件第一个数据的下标，
+		//不等于-1，代表存在相同的命名，则不新建；
+	},
+
+	//通过id找到子数据，找到所有的子数据
+	DelgetChildsfById(data,id){
+		var delarr =  data.filter(function(value){
+			return value.pid == id
+		})
+		if(delarr.length){
+			delarr.forEach(function(value){
+				delarr = delarr.concat(handle.DelgetChildsfById(data,value.id));
+			})
+		}
+		return delarr;
+	}
+	
+}
